@@ -14,8 +14,8 @@
         "runtime": "python3.9",
         "s3_bucket": "zappa-l6vy7wjfb",
         "environment_variables": {
-      "TFL_PRIMARY_KEY": "8268c6e2d5804a539e965b29c9fe9c3d",
-      "OWM_API_KEY": "29affb685157585c30ad7bbdc3639e20"
+            "TFL_PRIMARY_KEY": "YOUR_TFL_API_KEY",
+      "OWM_API_KEY": "YOUR_OPENWEATHER_API_KEY"
     }
     }
 }
