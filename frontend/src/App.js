@@ -20,7 +20,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   // Adjust to your local or deployed backend endpoint
-  const BACKEND_URL = 'http://127.0.0.1:5001/api/bus-info';
+  const BACKEND_URL = 'https://06d689dwm5.execute-api.eu-west-2.amazonaws.com/dev/api/bus-info';
 
   const fetchBusData = async () => {
     setLoading(true);

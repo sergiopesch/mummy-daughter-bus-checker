@@ -69,6 +69,7 @@ def fetch_arrivals(stop_id, line_name):
 # ------------------------------------------------------
 # Helper: Fetch Current Weather from OpenWeather
 # ------------------------------------------------------
+OWM_API_KEY = os.environ.get('OWM_API_KEY')
 def fetch_weather():
     """
     Example call to OpenWeatherMap for current weather in London.
