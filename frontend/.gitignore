@@ -35,7 +35,7 @@ logs/
 # If you have an IDE or code editor, ignore its settings
 .vscode/
 .idea/
-zappa_settings.json
+.zappa_settings.json
 .venv
 .myenv
 
