@@ -4,6 +4,8 @@ A **mobile-friendly** web app to see which bus is best to catch near your prefer
 
 This exaple is designed for quick, real-time updates on two bus stops so my wife can get to the correct bus stop at time in the morning to drop off our daughter at nursery.
 
+![Screenshot of the Web App](assets/Screenshot.png)
+
 ## Features
 
 - **Flask Backend** calling TFL’s API and OpenWeatherMap API to retrieve arrivals for two bus stops and weather data.
