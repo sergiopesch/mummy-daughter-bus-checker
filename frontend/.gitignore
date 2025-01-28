@@ -36,3 +36,6 @@ logs/
 .vscode/
 .idea/
 zappa_settings.json
+.venv
+.myenv
+
