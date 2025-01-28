@@ -1,11 +1,12 @@
-# London Bus Checker
+# Mummy & Daughter Bus Checker
 
-A **mobile-friendly** web app to see which bus is best to catch near Roehampton, London.  
-Designed for quick, real-time updates so you can get your daughter to nursery on time.
+A **mobile-friendly** web app to see which bus is best to catch near your preferred bus stops.
+
+This exaple is designed for quick, real-time updates on two bus stops so my wife can get to the correct bus stop at time in the morning to drop off our daughter at nursery.
 
 ## Features
 
-- **Flask Backend** calling TFL’s API to retrieve arrivals for two bus stops.
+- **Flask Backend** calling TFL’s API and OpenWeatherMap API to retrieve arrivals for two bus stops and weather data.
 - **React Frontend** that highlights the best bus (soonest arrival).
 - **Responsive Design** for iPhones and small screens.
 - **Deployed to AWS Lambda + API Gateway** for a serverless, scalable solution.
@@ -16,7 +17,7 @@ Designed for quick, real-time updates so you can get your daughter to nursery on
 - **React** (frontend)
 - **Zappa** for serverless deployment on AWS
 - **TFL StopPoint API** for real-time arrival info
-
+- **OpenWeatherMap API** for real-time weather data
 ## Local Setup
 
 1. **Clone** this repo.
@@ -31,11 +32,13 @@ Designed for quick, real-time updates so you can get your daughter to nursery on
    The Flask server runs on http://127.0.0.1:5000
 
 3. **Frontend**:
+    ```bash
     cd ../frontend
     npm install
     npm start
+    ```
     The React app runs on http://localhost:3000
     Make sure the fetch URL in App.js is http://127.0.0.1:5000/api/bus-info if running locally
 
-    
+
 
