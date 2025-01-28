@@ -2,7 +2,7 @@
 
 This is the **Flask** backend that fetches:
 - **Real-time bus arrivals** from London’s TFL API.
-- (Optionally) **Weather** data from OpenWeatherMap.
+- **Real-Time Weather** data from OpenWeatherMap API.
 
 It provides a simple JSON response with:
 - `bestBus` (the next soonest bus),
