@@ -1,38 +1,118 @@
-.App {
+/* Base reset */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background: #f9f9f9;
+  color: #333;
+}
+
+/* Main container */
+.app-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Header area */
+.header-message h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.3rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.greeting {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* Error, Loading, No-Buses */
+.error-message,
+.loading-message,
+.no-buses-message {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin: 1rem 0;
+}
+
+/* Best bus card */
+.best-bus-card {
+  background: #fff;
+  border-left: 8px solid #28a745;
+  /* green edge */
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Next bus card */
+.next-bus-card {
+  background: #fff;
+  border-left: 6px solid #007aff;
+  /* apple-like blue edge */
+  border-radius: 6px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Shared styling for cards */
+.best-bus-card h2,
+.next-bus-card h2 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+/* Stop name styling */
+.stop-name {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #555;
+}
+
+/* Refresh button */
+.refresh-button {
+  background: #007aff;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  transition: background 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.refresh-button:hover {
+  background: #005bb5;
+}
+
+/* Responsive for small screens (iPhones) */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.5rem;
   }
-}
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+  .best-bus-card,
+  .next-bus-card {
+    margin-bottom: 1rem;
+    padding: 1rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .refresh-button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
   }
 }

@@ -6,89 +6,102 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# ---------------------------------------------
-# Stop IDs + desired bus lines
-# ---------------------------------------------
-# You asked to change Stop A to 490011642E
-# For demonstration, let's say Stop A is only for lineName "33"
-STOP_ID_1 = "490011642E"
-DESIRED_LINE_A = "33"
+# ------------------------------------------------------
+# TFL Stop IDs and Lines
+# Update these if needed
+# ------------------------------------------------------
+STOP_A_ID = "490011642E"  # for line "33"
+STOP_B_ID = "490011715C"  # for line "419"
+LINE_A = "33"
+LINE_B = "419"
 
-# Stop B remains your previous ID (or whatever ID you want),
-# and we only care about lineName "419"
-STOP_ID_2 = "490011715C"
-DESIRED_LINE_B = "419"
+# If you have your TFL subscription key, store it in an env var:
+# e.g., export TFL_PRIMARY_KEY="xxxxxx"
+TFL_PRIMARY_KEY = os.environ.get('TFL_PRIMARY_KEY')
 
-# If TFL requires an app_id/app_key, fetch them from env variables or hardcode
-# TFL_APP_ID = os.environ.get('TFL_APP_ID')
-# TFL_APP_KEY = os.environ.get('TFL_APP_KEY')
+# We'll define a cutoff: ignore any bus more than 2 hours away
+timeCutoffMins = 120  # Adjust to whatever makes sense for you (in minutes)
 
-def get_earliest_bus(stop_id, desired_line):
+def fetch_arrivals(stop_id, line_name):
     """
-    Fetch the earliest arriving bus for a given TFL stop,
-    but only return data for the desired line (e.g., "419" or "33").
+    Fetch real-time arrivals for a given TFL stop & line,
+    ignoring any arrivals that are more than 'timeCutoffMins' in the future.
     """
-    # Construct the URL + (optional) add credentials as query params
-    # params = {'app_id': TFL_APP_ID, 'app_key': TFL_APP_KEY}
-    # r = requests.get(f"https://api.tfl.gov.uk/StopPoint/{stop_id}/Arrivals", params=params)
-    r = requests.get(f"https://api.tfl.gov.uk/StopPoint/{stop_id}/Arrivals")
-    if r.status_code != 200:
-        print(f"Error fetching data for stop {stop_id}: {r.status_code}")
-        return None
+    url = f"https://api.tfl.gov.uk/StopPoint/{stop_id}/Arrivals"
+    
+    headers = {}
+    if TFL_PRIMARY_KEY:
+        # TFL's recommended header name for subscription key
+        headers["ocp-apim-subscription-key"] = TFL_PRIMARY_KEY
 
-    arrivals = r.json()  # should be a list of arrival objects
+    try:
+        r = requests.get(url, headers=headers, timeout=5)
+        if r.status_code != 200:
+            print(f"Error from TFL ({stop_id}, {line_name}): {r.status_code}")
+            return []
 
-    # Filter to only include the desired bus line
-    filtered = [a for a in arrivals if a.get('lineName') == desired_line]
-    if not filtered:
-        # Means there are no arrivals for the specific line we're interested in
-        return None
+        arrivals = r.json()  # list of arrival objects
 
-    # Sort by earliest arrival time
-    filtered.sort(key=lambda x: x['timeToStation'])
-    earliest = filtered[0]
-    arrival_mins = earliest['timeToStation'] // 60  # convert to integer minutes
+        # Filter by line name
+        filtered = [a for a in arrivals if a.get('lineName') == line_name]
 
-    return {
-        'stopId': stop_id,
-        'lineName': earliest['lineName'],
-        'destination': earliest['destinationName'],
-        'arrivalMins': arrival_mins
-    }
+        # Sort by earliest arrival
+        filtered.sort(key=lambda x: x['timeToStation'])
+
+        # Now exclude anything that arrives in more than 2 hours
+        # e.g. If TFL says next bus is 5 hours away, we show "no bus"
+        valid = []
+        for arr in filtered:
+            tts = arr.get('timeToStation', 9999999)  # default large if missing
+            if 0 <= tts <= timeCutoffMins * 60:
+                valid.append(arr)
+
+        return valid
+
+    except requests.exceptions.RequestException as e:
+        print(f"Request error: {e}")
+        return []
+
 
 @app.route('/api/bus-info', methods=['GET'])
 def bus_info():
     """
-    Compare earliest bus times (for each stop's desired line)
-    and return which one arrives first.
+    Merge arrivals for lines 33 & 419 at their respective stops,
+    return the earliest 2 within the cutoff window.
     """
-    busA = get_earliest_bus(STOP_ID_1, DESIRED_LINE_A)
-    busB = get_earliest_bus(STOP_ID_2, DESIRED_LINE_B)
+    arrivals_a = fetch_arrivals(STOP_A_ID, LINE_A)
+    arrivals_b = fetch_arrivals(STOP_B_ID, LINE_B)
 
-    # If no results for either line, return custom message
-    if not busA and not busB:
+    combined = arrivals_a + arrivals_b
+    if not combined:
         return jsonify({
-            'stopA': None,
-            'stopB': None,
-            'bestStop': None,
-            'message': "There are no busses to take our daughter now, love you"
+            "message": "Cuchi, no hay buses ahorita. Love you!"
         }), 200
 
-    # Decide which stop is best (earliest)
-    if busA and busB:
-        best = busA if busA['arrivalMins'] < busB['arrivalMins'] else busB
-    else:
-        best = busA or busB
+    # Sort everything by earliest arrival
+    combined.sort(key=lambda x: x['timeToStation'])
+
+    def format_arrival(arr):
+        return {
+            "stopId": arr.get("naptanId"),
+            "stopName": arr.get("stationName") or "Unknown Stop",
+            "lineName": arr.get("lineName"),
+            "destination": arr.get("destinationName"),
+            "arrivalMins": arr.get("timeToStation", 0) // 60
+        }
+
+    bestBus = format_arrival(combined[0])
+    nextBus = format_arrival(combined[1]) if len(combined) > 1 else None
 
     return jsonify({
-        'stopA': busA,
-        'stopB': busB,
-        'bestStop': best
-    })
+        "bestBus": bestBus,
+        "nextBus": nextBus
+    }), 200
 
 @app.route('/')
 def index():
-    return "Hello from the Bus App!"
+    return "Hola from the Bus App!"
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # By default, run on port 5001. Adjust as needed.
+    app.run(debug=True, port=5001)

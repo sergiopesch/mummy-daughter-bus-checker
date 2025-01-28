@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/speschiera/Documents/2024 Build/mywife-busapp/.venv/bin/python" "$0" "$@"
+'''exec' "/Users/speschiera/Documents/2024 Build/mywife-busapp/.venv/bin/python3.12" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
