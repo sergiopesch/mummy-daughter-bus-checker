@@ -1,4 +1,4 @@
-# Mummy & Daughter Bus Checker
+# Mummy & Daughter Bus Checker 
 
 A **mobile-friendly** web app to see which bus is best to catch near your preferred bus stops.
 
