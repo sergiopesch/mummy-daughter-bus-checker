@@ -1,6 +1,6 @@
 # Mum & Daughter Bus Checker 
 
-A **mobile-friendly** web app for my wife to see which bus is best to catch the upcoming busnear our home in London to take our daughter to nursery, combining real-time updates with weather data.
+A **mobile-friendly** web app for my wife to see which bus is best to catch near our home in London to take our daughter to nursery, combining real-time updates with weather data.
 
 <p align="center">
   <img src="assets/Screenshot.png"
