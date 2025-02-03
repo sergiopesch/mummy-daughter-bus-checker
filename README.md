@@ -1,8 +1,6 @@
 # Mum & Daughter Bus Checker 
 
-A **mobile-friendly** web app for my wife for her to see which bus is best to catch near my house to take our daughter to nursery.
-
-This exaple is designed for quick, real-time updates on two bus stops and weather data.
+A **mobile-friendly** web app for my wife to see which bus is best to catch near my house to take our daughter to nursery combining real-time updates on two bus stops with weather data.
 
 <p align="center">
   <img src="assets/Screenshot.png"
