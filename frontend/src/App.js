@@ -1,170 +1,143 @@
+import HeroSection from './components/HeroSection';
+import WeatherCard from './components/WeatherCard';
+import BusCard from './components/BusCard';
+import './theme/variables.css';
+import './theme/global.css';
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import {
+  IonApp,
+  IonPage,
+  IonContent,
+  IonSpinner,
+  IonButton,
+  IonRefresher,
+  IonRefresherContent
+} from '@ionic/react';
 
-/**
- * Spanish greeting logic:
- *  - 5am-11:59am => Buenos días
- *  - 12pm-18:59 => Buenas tardes
- *  - otherwise => Buenas noches
- */
-function getSpanishGreeting() {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return "Buenos días";
-  if (hour >= 12 && hour < 19) return "Buenas tardes";
-  return "Buenas noches";
-}
+/* Ionicons icon registration (for the pull-to-refresh icon) */
+import { addIcons } from 'ionicons';
+import { arrowDownCircleOutline } from 'ionicons/icons';
+addIcons({ 'arrow-down-circle-outline': arrowDownCircleOutline });
 
-function App() {
+export default function App() {
   const [busData, setBusData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Adjust to your local or deployed backend endpoint
-  const BACKEND_URL = 'https://06d689dwm5.execute-api.eu-west-2.amazonaws.com/dev/api/bus-info';
+  const BACKEND_URL = 'http://127.0.0.1:5001/api/bus-info';
 
-  const fetchBusData = async () => {
+  async function fetchBusData() {
+    console.log("Starting fetchBusData...");
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(BACKEND_URL);
+      console.log("Fetch response:", response);
       if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
+        throw new Error(`Server responded with status ${response.status}`);
       }
       const data = await response.json();
+      console.log("Fetched data:", data);
       setBusData(data);
     } catch (err) {
+      console.error("Fetch error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
+      console.log("Finished fetchBusData.");
     }
-  };
+  }
 
+  // Fetch once on mount
   useEffect(() => {
     fetchBusData();
   }, []);
 
-  // We'll compute the greeting once
-  const greeting = getSpanishGreeting();
-
-  /* ----------------------------------------------------------------
-   * RENDER STATES
-   * ----------------------------------------------------------------
-   */
-
-  // 1) ERROR
-  if (error) {
-    return (
-      <div className="container">
-        <HeroSection greeting={greeting} />
-        <div className="error-card card">
-          <h2>Error</h2>
-          <p>{error}</p>
-          <button onClick={fetchBusData} className="refresh-button">Reintentar</button>
-        </div>
-      </div>
-    );
-  }
-
-  // 2) LOADING
-  if (loading) {
-    return (
-      <div className="container">
-        <HeroSection greeting={greeting} />
-        <div className="loading-card card">
-          <p>Cargando información...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 3) NO BUSES
-  if (busData?.message) {
-    return (
-      <div className="container">
-        <HeroSection greeting={greeting} />
-        {/* Weather card if we have data */}
-        {busData.weather && <WeatherCard weather={busData.weather} />}
-        <div className="no-bus-card card">
-          <p>{busData.message}</p>
-        </div>
-        <button onClick={fetchBusData} className="refresh-button">Refrescar</button>
-      </div>
-    );
-  }
-
-  // 4) NORMAL: we have bestBus, nextBus, weather
-  const { bestBus, nextBus, weather } = busData;
+  // Pull-to-refresh callback
+  const handleRefresh = async (event) => {
+    await fetchBusData();
+    event.detail.complete(); // Stop IonRefresher spinner
+  };
 
   return (
-    <div className="container">
-      <HeroSection greeting={greeting} />
+    <IonApp>
+      <IonPage>
+        <IonContent fullscreen>
+          {/* iOS Pull to Refresh */}
+          <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
+            <IonRefresherContent
+              pullingIcon="arrow-down-circle-outline"
+              refreshingSpinner="circles"
+              pullingText="Pull to refresh"
+              refreshingText="Refreshing..."
+            />
+          </IonRefresher>
 
-      {/* Weather */}
-      {weather && <WeatherCard weather={weather} />}
+          {/* Centered container for all content */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: '100%', maxWidth: '600px' }}>
+              {/* Hero Section at top */}
+              <HeroSection />
 
-      {/* Best Bus */}
-      {bestBus && (
-        <div className="best-bus-card card">
-          <h2>Mejor Bus</h2>
-          <p className="bus-stop-name">{bestBus.stopName}</p>
-          <p><strong>Número de Bus:</strong> {bestBus.lineName}</p>
-          <p><strong>Destino:</strong> {bestBus.destination}</p>
-          <p><strong>Llega en:</strong> {bestBus.arrivalMins} min</p>
-        </div>
-      )}
+              {/* Error */}
+              {error && (
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                  <h2>Error</h2>
+                  <p>{error}</p>
+                  <IonButton onClick={fetchBusData} color="danger">
+                    Reintentar
+                  </IonButton>
+                </div>
+              )}
 
-      {/* Next Bus */}
-      {nextBus && (
-        <div className="next-bus-card card">
-          <h2>Siguiente Bus</h2>
-          <p className="bus-stop-name">{nextBus.stopName}</p>
-          <p><strong>Número de Bus:</strong> {nextBus.lineName}</p>
-          <p><strong>Destino:</strong> {nextBus.destination}</p>
-          <p><strong>Llega en:</strong> {nextBus.arrivalMins} min</p>
-        </div>
-      )}
+              {/* Loading */}
+              {loading && !error && (
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                  <IonSpinner name="crescent" />
+                  <p>Cargando información...</p>
+                </div>
+              )}
 
-      <button onClick={fetchBusData} className="refresh-button">
-        Refrescar
-      </button>
-    </div>
+              {/* If backend returned a message (e.g., "No buses available") */}
+              {busData?.message && !loading && !error && (
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                  <h2>{busData.message}</h2>
+                </div>
+              )}
+
+              {/* Bus Cards */}
+              {!loading && !error && busData && !busData.message && (
+                <>
+                  {busData.bestBus && (
+                    <BusCard
+                      busData={busData.bestBus}
+                      colorClass="bus-card-green"
+                    />
+                  )}
+                  {busData.nextBus && (
+                    <BusCard
+                      busData={busData.nextBus}
+                      colorClass="bus-card-blue"
+                    />
+                  )}
+                </>
+              )}
+
+              {/* Weather Card at the bottom */}
+              {!loading && !error && busData?.weather && (
+                <WeatherCard weather={busData.weather} />
+              )}
+
+              {/* Fallback: No data at all */}
+              {!loading && !error && !busData && (
+                <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                  <h3>No data to display (busData is null or empty).</h3>
+                </div>
+              )}
+            </div>
+          </div>
+        </IonContent>
+      </IonPage>
+    </IonApp>
   );
 }
-
-/* 
- * HeroSection: top banner with bus image + greeting 
- */
-function HeroSection({ greeting }) {
-  return (
-    <div className="hero">
-      {/* Bus image is stored in public/bus.png */}
-      <img src="/bus.png" alt="Red London Bus" className="bus-image" />
-      <div className="hero-text">
-        <h1>Mummy &amp; Daughter Bus Checker</h1>
-        <p>{greeting}, mi cuchi linda!</p>
-      </div>
-    </div>
-  );
-}
-
-/*
- * Weather Card (Clima)
- */
-function WeatherCard({ weather }) {
-  const { tempC, feelsLikeC, main, description, icon } = weather;
-  const iconUrl = icon ? `http://openweathermap.org/img/wn/${icon}@2x.png` : null;
-
-  return (
-    <div className="weather-card card">
-      <h2>Clima</h2>
-      {iconUrl && (
-        <img src={iconUrl} alt={description} className="weather-icon" />
-      )}
-      <p><strong>Estado:</strong> {main} ({description})</p>
-      <p><strong>Temperatura:</strong> {tempC}°C</p>
-      <p><strong>Sensación:</strong> {feelsLikeC}°C</p>
-    </div>
-  );
-}
-
-export default App;

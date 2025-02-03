@@ -1,0 +1,27 @@
+/* BusCard.css */
+
+.time-icon {
+    animation: pulse 1.5s infinite alternate;
+    font-size: 1.5rem;
+    color: #f6c623;
+    /* or any accent color */
+}
+
+@keyframes pulse {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.3);
+    }
+}
+
+/* Optionally keep colored borders from your global.css */
+.bus-card-green {
+    border-left: 8px solid #37df69;
+}
+
+.bus-card-blue {
+    border-left: 8px solid #64b5f6;
+}
