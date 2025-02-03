@@ -23,14 +23,10 @@ timeCutoffMins = 120
 # ------------------------------------------------------
 # OpenWeatherMap Settings
 # ------------------------------------------------------
-# e.g. sign up at https://openweathermap.org/api, get your key
 OWM_API_KEY = os.environ.get('OWM_API_KEY')  # e.g., 'abcdef123456'
-CITY_NAME = "London"  # You can refine to a specific city or lat/lon
-COUNTRY_CODE = "GB"   # For the UK
+CITY_NAME = "London" 
+COUNTRY_CODE = "GB"
 
-# ------------------------------------------------------
-# Helper: Fetch TFL Arrivals
-# ------------------------------------------------------
 def fetch_arrivals(stop_id, line_name):
     """
     Fetch real-time arrivals for a given TFL stop & line.
@@ -48,7 +44,7 @@ def fetch_arrivals(stop_id, line_name):
             print(f"TFL error for {stop_id}-{line_name}: {r.status_code}")
             return []
 
-        arrivals = r.json()  # List of arrival objects
+        arrivals = r.json()
         # Filter by line
         filtered = [a for a in arrivals if a.get('lineName') == line_name]
         # Sort by earliest arrival
@@ -57,7 +53,7 @@ def fetch_arrivals(stop_id, line_name):
         # Exclude anything beyond the cutoff (2 hours)
         valid = []
         for arr in filtered:
-            tts = arr.get('timeToStation', 999999)  # seconds
+            tts = arr.get('timeToStation', 999999)
             if 0 <= tts <= timeCutoffMins * 60:
                 valid.append(arr)
         return valid
@@ -66,10 +62,6 @@ def fetch_arrivals(stop_id, line_name):
         print(f"Request error: {e}")
         return []
 
-# ------------------------------------------------------
-# Helper: Fetch Current Weather from OpenWeather
-# ------------------------------------------------------
-OWM_API_KEY = os.environ.get('OWM_API_KEY')
 def fetch_weather():
     """
     Example call to OpenWeatherMap for current weather in London.
@@ -80,10 +72,11 @@ def fetch_weather():
         print("No OWM_API_KEY found. Weather will not be fetched.")
         return None
 
-    # You can also use lat/lon if you prefer:
-    # e.g.: url = f"https://api.openweathermap.org/data/2.5/weather?lat=51.5074&lon=-0.1278&appid={OWM_API_KEY}&units=metric"
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={CITY_NAME},{COUNTRY_CODE}&appid={OWM_API_KEY}&units=metric"
-
+    url = (
+        f"https://api.openweathermap.org/data/2.5/weather"
+        f"?q={CITY_NAME},{COUNTRY_CODE}"
+        f"&appid={OWM_API_KEY}&units=metric"
+    )
     try:
         r = requests.get(url, timeout=5)
         if r.status_code != 200:
@@ -91,14 +84,13 @@ def fetch_weather():
             return None
         data = r.json()
         
-        # Extract relevant fields
         main_data = data.get('main', {})
-        weather_data = data.get('weather', [{}])[0]  # first item in 'weather' list
-        tempC = main_data.get('temp')         # already in Celsius because we used units=metric
+        weather_data = data.get('weather', [{}])[0]
+        tempC = main_data.get('temp')         # Celsius from units=metric
         feelsC = main_data.get('feels_like')
-        w_main = weather_data.get('main', '')  # e.g. "Rain", "Clouds", "Clear"
-        w_desc = weather_data.get('description', '')  # e.g. "light rain"
-        w_icon = weather_data.get('icon', '')  # e.g. "04d"
+        w_main = weather_data.get('main', '') # e.g. "Rain", "Clouds", "Clear"
+        w_desc = weather_data.get('description', '')
+        w_icon = weather_data.get('icon', '')
 
         return {
             "tempC": round(tempC) if tempC is not None else None,
@@ -107,16 +99,13 @@ def fetch_weather():
             "description": w_desc,
             "icon": w_icon
         }
+
     except requests.exceptions.RequestException as e:
         print(f"Weather request error: {e}")
         return None
 
-# ------------------------------------------------------
-# Main endpoint: /api/bus-info
-# ------------------------------------------------------
 @app.route('/api/bus-info', methods=['GET'])
 def bus_info():
-    # Fetch bus data
     arrivals_a = fetch_arrivals(STOP_A_ID, LINE_A)
     arrivals_b = fetch_arrivals(STOP_B_ID, LINE_B)
 
@@ -133,22 +122,18 @@ def bus_info():
         }
 
     if not combined:
-        # No bus arrivals
         return jsonify({
             "message": "There are no buses to take our daughter now, love you",
-            "weather": fetch_weather()  # Return weather anyway if you want
+            "weather": fetch_weather()
         }), 200
 
     bestBus = format_arrival(combined[0])
     nextBus = format_arrival(combined[1]) if len(combined) > 1 else None
 
-    # Fetch weather
-    weather = fetch_weather()
-
     return jsonify({
         "bestBus": bestBus,
         "nextBus": nextBus,
-        "weather": weather
+        "weather": fetch_weather()
     }), 200
 
 @app.route('/')
@@ -156,5 +141,4 @@ def index():
     return "Hello from the Bus App!"
 
 if __name__ == '__main__':
-    # e.g. run on port 5001
     app.run(debug=True, port=5001)

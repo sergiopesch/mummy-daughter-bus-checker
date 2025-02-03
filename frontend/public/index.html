@@ -3,13 +3,52 @@
 
 <head>
   <meta charset="utf-8" />
+
+  <!-- Title -->
   <title>Mum & Daughter Bus Checker</title>
+
+  <!-- Mobile meta tags for responsive design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <!-- Theme/Branding Colors -->
+  <!-- Adjust the theme color to match your brand -->
+  <meta name="theme-color" content="#fdf2e9" />
+
+  <!-- Favicon and Manifest -->
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" type="image/x-icon" />
+
+  <!-- iOS PWA icons/behavior (optional) -->
+  <!-- Replace with your own images if you want custom iOS icons -->
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <!-- Basic SEO (optional) -->
+  <meta name="description" content="A simple bus arrival checker and weather widget for my family" />
+  <meta property="og:title" content="Mum & Daughter Bus Checker" />
+  <meta property="og:description" content="Check upcoming bus times and weather easily on mobile!" />
+  <meta property="og:type" content="website" />
+  <!-- If you want an Open Graph image:
+  <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
+  -->
+
+  <!-- Custom CSS or Fonts (if needed) -->
+  <!-- For example: <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans" /> -->
+
+  <style>
+    /* Basic body styling for consistency */
+    body {
+      margin: 0;
+      background-color: #fdf2e9;
+      /* matches theme-color */
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+  </style>
 </head>
 
 <body>
+  <!-- React root -->
   <div id="root"></div>
 </body>
 

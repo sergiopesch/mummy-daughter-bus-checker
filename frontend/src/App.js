@@ -24,7 +24,7 @@ export default function App() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const BACKEND_URL = 'http://127.0.0.1:5001/api/bus-info';
+  const BACKEND_URL = 'https://3uekhchws8.execute-api.eu-west-2.amazonaws.com/dev/api/bus-info';
 
   async function fetchBusData() {
     console.log("Starting fetchBusData...");
