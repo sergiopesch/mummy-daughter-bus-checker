@@ -1,10 +1,14 @@
-# Mummy & Daughter Bus Checker 
+# Mum & Daughter Bus Checker 
 
-A **mobile-friendly** web app to see which bus is best to catch near your preferred bus stops.
+A **mobile-friendly** web app for my wife for her to see which bus is best to catch near my house to take our daughter to nursery.
 
-This exaple is designed for quick, real-time updates on two bus stops so my wife can get to the correct bus stop at time in the morning to drop off our daughter at nursery.
+This exaple is designed for quick, real-time updates on two bus stops and weather data.
 
-![Screenshot of the Web App](assets/Screenshot.png)
+<p align="center">
+  <img src="assets/Screenshot.png"
+       alt="Screenshot of the Web App"
+       width="400" />
+</p>
 
 ## Features
 
@@ -20,9 +24,11 @@ This exaple is designed for quick, real-time updates on two bus stops so my wife
 - **Zappa** for serverless deployment on AWS
 - **TFL StopPoint API** for real-time arrival info
 - **OpenWeatherMap API** for real-time weather data
+
 ## Local Setup
 
 1. **Clone** this repo.
+
 2. **Backend**:
    ```bash
    cd backend
